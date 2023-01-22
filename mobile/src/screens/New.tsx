@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Alert,
   ScrollView,
   Text,
   TextInput,
@@ -11,6 +12,7 @@ import colors from "tailwindcss/colors";
 
 import { BackButton } from "../components/BackButton";
 import { CheckBox } from "../components/CheckBox";
+import { api } from "../lib/axios";
 
 const availableWeekDays = [
   "Domingo",
@@ -23,6 +25,7 @@ const availableWeekDays = [
 ];
 
 export function New() {
+  const [title, setTitle] = useState("");
   const [weekDays, setWeekDays] = useState<number[]>([]);
 
   function handleToggleWeekDay(weekDayIndex: number) {
@@ -32,6 +35,33 @@ export function New() {
       );
     } else {
       setWeekDays((prevState) => [...prevState, weekDayIndex]);
+    }
+  }
+
+  async function handleCreateNewHabit() {
+    try {
+      if (!title.trim()) {
+        Alert.alert("Novo Hábito", "Informe o nome do hábito.");
+        return;
+      }
+
+      if (weekDays.length === 0) {
+        Alert.alert("Novo Hábito", "Escolha a periodicidade do hábito.");
+        return;
+      }
+
+      await api.post("/habits", {
+        title,
+        weekDays,
+      });
+
+      setTitle("");
+      setWeekDays([]);
+
+      Alert.alert("Novo hábito", "Hábito criado com sucesso!");
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Ops...", "Não foi possível criar o novo hábito.");
     }
   }
 
@@ -55,6 +85,8 @@ export function New() {
           placeholder="ex.: Exercícios, dormir bem, etc..."
           placeholderTextColor={colors.zinc[400]}
           className="h-12 pl-4 mt-3 text-white border-2 rounded-lg bg-zinc-900 border-zinc-800 focus:border-green-600"
+          value={title}
+          onChangeText={setTitle}
         />
 
         <Text className="mt-4 mb-3 text-base font-semibold text-white">
@@ -72,6 +104,7 @@ export function New() {
 
         <TouchableOpacity
           activeOpacity={0.7}
+          onPress={handleCreateNewHabit}
           className="flex-row items-center justify-center w-full mt-6 bg-green-600 rounded-md h-14"
         >
           <Feather name="check" size={20} color={colors.white} />
