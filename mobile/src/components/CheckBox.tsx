@@ -6,6 +6,7 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import colors from "tailwindcss/colors";
+import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 
 interface Props extends TouchableOpacityProps {
   title: string;
@@ -20,9 +21,13 @@ export function CheckBox({ title, checked = false, ...rest }: Props) {
       {...rest}
     >
       {checked ? (
-        <View className="items-center justify-center w-8 h-8 bg-green-500 rounded-lg">
+        <Animated.View
+          className="items-center justify-center w-8 h-8 bg-green-500 rounded-lg"
+          entering={ZoomIn}
+          exiting={ZoomOut}
+        >
           <Feather name="check" size={20} color={colors.white} />
-        </View>
+        </Animated.View>
       ) : (
         <View className="w-8 h-8 rounded-lg bg-zinc-900" />
       )}
